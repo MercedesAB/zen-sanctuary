@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zen Sanctuary | Digital Refuge & Focus ADHD</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { background-color: #020617; color: white; overflow-x: hidden; font-family: sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .gradient-text { background: linear-gradient(90deg, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .active-sound { border-color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+        .transition-all { transition: all 0.3s ease; }
+    </style>
+</head>
+<body>
+
+    <nav class="fixed w-full z-50 p-6 flex justify-between items-center">
+        <div class="text-xl font-light tracking-widest">ZEN_SANCTUARY</div>
+        <div class="flex gap-4 md:gap-6 items-center">
+            <button onclick="toggleLang()" id="lang-btn" class="text-[10px] md:text-xs uppercase tracking-widest opacity-70 hover:opacity-100 transition-all border border-white/20 px-3 py-1 rounded-full">
+                English 🌐
+            </button>
+            <a href="#" id="nav-premium" class="glass px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition-all">Obtener Premium</a>
+        </div>
+    </nav>
+
+    <section id="hero" class="min-h-screen flex flex-col justify-center items-center px-4 text-center">
+        <h1 class="text-6xl md:text-8xl font-thin mb-6 tracking-tighter">Tu mente, <span class="gradient-text" id="hero-span">en orden.</span></h1>
+        <p id="hero-p" class="max-w-2xl text-slate-400 text-lg md:text-xl mb-10">
+            Un santuario interactivo basado en ciencia para el enfoque, la regulación del TDAH y la claridad mental.
+        </p>
+        
+        <div class="w-full max-w-md">
+            <input type="text" id="mainTask" placeholder="¿En qué te vas a enfocar ahora?" 
+                   class="w-full bg-slate-800/50 border border-slate-700 p-5 rounded-2xl mb-4 outline-none focus:border-blue-500 transition-all text-center">
+            <button onclick="startApp()" id="hero-btn" class="w-full bg-white text-black font-bold p-5 rounded-2xl hover:bg-slate-200 transition-all uppercase tracking-widest text-sm">
+                Entrar al Santuario
+            </button>
+        </div>
+    </section>
+
+    <main id="app-container" class="hidden fixed inset-0 z-[100] bg-black flex flex-col md:flex-row">
+        <aside class="w-full md:w-80 glass p-8 flex flex-col justify-between">
+            <div>
+                <button onclick="closeApp()" id="app-back" class="mb-10 opacity-50 hover:opacity-100 text-[10px] uppercase">← Volver al mundo</button>
+                <h2 id="app-focus-label" class="text-[10px] uppercase tracking-widest text-blue-400 mb-8 font-semibold">Enfoque Activo</h2>
+                <div id="displayTask" class="text-2xl font-light mb-12 italic text-slate-200"></div>
+                
+                <h2 id="app-sounds-label" class="text-[10px] uppercase tracking-widest text-blue-400 mb-4 font-semibold">Elegir Frecuencia</h2>
+                <div class="space-y-4">
+                    <button id="btn-brown" onclick="toggleBrownNoise()" class="w-full text-left p-4 rounded-xl border border-transparent hover:bg-white/5 transition-all flex justify-between items-center group">
+                        <span>Brown Noise</span>
+                        <span id="status-brown" class="text-[10px] opacity-40 group-hover:opacity-100">PLAY</span>
+                    </button>
+                    
+                    <button class="w-full text-left p-4 rounded-xl hover:bg-white/5 transition-all flex justify-between opacity-50 cursor-not-allowed">
+                        <span id="label-ocean">Océano Profundo</span> <span id="label-locked" class="text-[10px]">Bloqueado</span>
+                    </button>
+                    
+                    <button class="w-full text-left p-4 rounded-xl hover:bg-white/10 transition-all border border-yellow-500/50 text-yellow-500">
+                        <span>Purr Therapy</span> <span class="font-bold ml-2 text-[10px] underline tracking-tighter">PREMIUM</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div id="app-footer" class="text-[10px] opacity-30 leading-relaxed uppercase tracking-tighter mt-8">
+                Frecuencias entre 25-150Hz. <br> Regulación digital con base científica.
+            </div>
+        </aside>
+
+        <div id="canvas-container" class="flex-1 relative bg-slate-950">
+            <div id="loading" class="absolute inset-0 flex items-center justify-center text-[10px] uppercase tracking-widest opacity-20">Cargando Escena...</div>
+        </div>
+    </main>
+
+    <script>
+        let audioCtx, noiseNode, isPlaying = false;
+        let currentLang = 'es';
+
+        const texts = {
+            es: {
+                langBtn: "English 🌐",
+                navPremium: "Obtener Premium",
+                heroSpan: "en orden.",
+                heroP: "Un santuario interactivo basado en ciencia para el enfoque, la regulación del TDAH y la claridad mental.",
+                heroInput: "¿En qué te vas a enfocar ahora?",
+                heroBtn: "Entrar al Santuario",
+                appBack: "← Volver al mundo",
+                appFocus: "Enfoque Activo",
+                appSounds: "Elegir Frecuencia",
+                appFooter: "Frecuencias entre 25-150Hz. <br> Regulación digital con base científica.",
+                labelOcean: "Océano Profundo",
+                labelLocked: "Bloqueado",
+                loading: "Cargando Escena..."
+            },
+            en: {
+                langBtn: "Español 🌐",
+                navPremium: "Get Premium",
+                heroSpan: "uncluttered.",
+                heroP: "A science-based interactive sanctuary for focus, ADHD regulation, and mental clarity.",
+                heroInput: "What's your focus right now?",
+                heroBtn: "Enter the Sanctuary",
+                appBack: "← Back to World",
+                appFocus: "Active Focus",
+                appSounds: "Choose Frequency",
+                appFooter: "Frequencies between 25-150Hz. <br> Science-backed digital regulation.",
+                labelOcean: "Deep Ocean",
+                labelLocked: "Locked",
+                loading: "Loading Scene..."
+            }
+        };
+
+        function toggleLang() {
+            currentLang = currentLang === 'es' ? 'en' : 'es';
+            const t = texts[currentLang];
+            
+            document.getElementById('lang-btn').innerText = t.langBtn;
+            document.getElementById('nav-premium').innerText = t.navPremium;
+            document.getElementById('hero-span').innerText = t.heroSpan;
+            document.getElementById('hero-p').innerText = t.heroP;
+            document.getElementById('mainTask').placeholder = t.heroInput;
+            document.getElementById('hero-btn').innerText = t.heroBtn;
+            document.getElementById('app-back').innerText = t.appBack;
+            document.getElementById('app-focus-label').innerText = t.appFocus;
+            document.getElementById('app-sounds-label').innerText = t.appSounds;
+            document.getElementById('app-footer').innerHTML = t.appFooter;
+            document.getElementById('label-ocean').innerText = t.labelOcean;
+            document.getElementById('label-locked').innerText = t.labelLocked;
+            document.getElementById('loading').innerText = t.loading;
+        }
+
+        function startApp() {
+            const task = document.getElementById('mainTask').value;
+            if(!task) return alert(currentLang === 'es' ? "Define tu enfoque primero." : "Define your focus first.");
+            document.getElementById('displayTask').innerText = `"${task}"`;
+            document.getElementById('app-container').classList.remove('hidden');
+            initThree();
+        }
+
+        function closeApp() {
+            stopBrownNoise();
+            document.getElementById('app-container').classList.add('hidden');
+        }
+
+        function toggleBrownNoise() {
+            if (!isPlaying) startBrownNoise(); else stopBrownNoise();
+        }
+
+        function startBrownNoise() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const bufferSize = 4096;
+            let lastOut = 0.0;
+            noiseNode = audioCtx.createScriptProcessor(bufferSize, 1, 1);
+            noiseNode.onaudioprocess = function(e) {
+                let output = e.outputBuffer.getChannelData(0);
+                for (let i = 0; i < bufferSize; i++) {
+                    let white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02;
+                    lastOut = output[i];
+                    output[i] *= 3.5;
+                }
+            }
+            noiseNode.connect(audioCtx.destination);
+            isPlaying = true;
+            document.getElementById('btn-brown').classList.add('active-sound');
+            document.getElementById('status-brown').innerText = 'STOP';
+        }
+
+        function stopBrownNoise() {
+            if (noiseNode) {
+                noiseNode.disconnect();
+                noiseNode = null;
+                isPlaying = false;
+                document.getElementById('btn-brown').classList.remove('active-sound');
+                document.getElementById('status-brown').innerText = 'PLAY';
+            }
+        }
+
+        function initThree() {
+            const container = document.getElementById('canvas-container');
+            if (container.children.length > 1) return;
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.innerHTML = ""; 
+            container.appendChild(renderer.domElement);
+            const geometry = new THREE.IcosahedronGeometry(2, 20);
+            const material = new THREE.MeshStandardMaterial({ color: 0x60a5fa, wireframe: true, transparent: true, opacity: 0.5 });
+            const sphere = new THREE.Mesh(geometry, material);
+            scene.add(sphere);
+            const light = new THREE.PointLight(0xffffff, 1, 100);
+            light.position.set(10, 10, 10);
+            scene.add(light);
+            camera.position.z = 5;
+            function animate() {
+                requestAnimationFrame(animate);
+                sphere.rotation.y += 0.002;
+                let scale = 1 + Math.sin(Date.now() * 0.001) * 0.1;
+                sphere.scale.set(scale, scale, scale);
+                renderer.render(scene, camera);
+            }
+            animate();
+            
+            window.addEventListener('resize', () => {
+                camera.aspect = container.clientWidth / container.clientHeight;
+                camera.updateProjectionMatrix();
+                renderer.setSize(container.clientWidth, container.clientHeight);
+            });
+        }
+    </script>
+</body>
+</html>
