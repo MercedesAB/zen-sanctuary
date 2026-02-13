@@ -9,6 +9,14 @@
     <style>
         body { background-color: #020410; color: white; overflow: hidden; font-family: sans-serif; }
         
+        /* TIPOGRAFÍA RECUPERADA: Fina y con degradado sutil */
+        .main-title { font-weight: 100; letter-spacing: -0.05em; line-height: 1.1; }
+        .gradient-text {
+            background: linear-gradient(90deg, #60a5fa, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
         .interactive {
             cursor: pointer !important;
             pointer-events: auto !important;
@@ -23,15 +31,11 @@
 
         .mode-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.1); }
         
-        /* Estados activos claros */
         .active-focus { opacity: 1; border-color: #3b82f6; color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
         .active-calm { opacity: 1; border-color: #a855f7; color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
         .active-creative { opacity: 1; border-color: #facc15; color: #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.3); }
 
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
-        
-        /* Título refinado, no gigante */
-        .main-title { font-weight: 100; letter-spacing: -0.02em; line-height: 1.1; }
     </style>
 </head>
 <body>
@@ -42,13 +46,13 @@
     </nav>
 
     <section id="hero" class="min-h-screen flex flex-col justify-center items-center px-4 text-center relative z-50">
-        <h1 id="main-title" class="main-title text-5xl md:text-7xl mb-12">
-            Tu mente, <span class="block opacity-30 italic">en orden.</span>
+        <h1 id="main-title" class="main-title text-6xl md:text-7xl mb-12">
+            <span id="h-part1">Tu mente,</span> <span class="gradient-text" id="h-part2">en orden.</span>
         </h1>
         
         <div class="w-full max-w-lg space-y-10">
             <input type="text" id="mainTask" placeholder="¿En qué vas a trabajar?" 
-                   class="w-full bg-transparent border-b border-white/10 p-4 outline-none text-center text-xl md:text-2xl font-light focus:border-white/40 transition-all">
+                   class="interactive w-full bg-transparent border-b border-white/10 p-4 outline-none text-center text-xl md:text-2xl font-light focus:border-white/40 transition-all">
             
             <div class="flex flex-wrap justify-center gap-3">
                 <button id="mode-focus" onclick="setMode('focus')" class="interactive mode-btn px-6 py-2 rounded-full text-[10px] uppercase tracking-widest">Enfoque</button>
@@ -90,8 +94,8 @@
         let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
         const ui = {
-            es: { title: 'Tu mente, <span class="block opacity-30 italic">en orden.</span>', placeholder: '¿En qué vas a trabajar?', focus: 'Enfoque', calm: 'Calma', creative: 'Crear', enter: 'Entrar', back: '← Volver', hint: 'Mueve el cursor para equilibrar la esfera', noise: 'Sonido Brown', modes: { focus: 'MODO ENFOQUE', calm: 'MODO CALMA', creative: 'MODO CREATIVO' } },
-            en: { title: 'Your mind, <span class="block opacity-30 italic">uncluttered.</span>', placeholder: 'What is your focus?', focus: 'Focus', calm: 'Calm', creative: 'Create', enter: 'Enter', back: '← Back', hint: 'Move cursor to balance the sphere', noise: 'Brown Noise', modes: { focus: 'FOCUS MODE', calm: 'CALM MODE', creative: 'CREATIVE MODE' } }
+            es: { p1: 'Tu mente,', p2: 'en orden.', placeholder: '¿En qué vas a trabajar?', focus: 'Enfoque', calm: 'Calma', creative: 'Crear', enter: 'Entrar', back: '← Volver', hint: 'Mueve el cursor para equilibrar la esfera', noise: 'Sonido Brown', modes: { focus: 'MODO ENFOQUE', calm: 'MODO CALMA', creative: 'MODO CREATIVO' } },
+            en: { p1: 'Your mind,', p2: 'uncluttered.', placeholder: 'What is your focus?', focus: 'Focus', calm: 'Calm', creative: 'Create', enter: 'Enter', back: '← Back', hint: 'Move cursor to balance the sphere', noise: 'Brown Noise', modes: { focus: 'FOCUS MODE', calm: 'CALM MODE', creative: 'CREATIVE MODE' } }
         };
 
         const config = { focus: { col: 0x3b82f6, spd: 0.001 }, calm: { col: 0xa855f7, spd: 0.0004 }, creative: { col: 0xfacc15, spd: 0.0025 } };
@@ -100,7 +104,8 @@
             isEnglish = !isEnglish;
             const l = isEnglish ? ui.en : ui.es;
             document.getElementById('lang-btn').innerText = isEnglish ? "ESPAÑOL 🌐" : "ENGLISH 🌐";
-            document.getElementById('main-title').innerHTML = l.title;
+            document.getElementById('h-part1').innerText = l.p1;
+            document.getElementById('h-part2').innerText = l.p2;
             document.getElementById('mainTask').placeholder = l.placeholder;
             document.getElementById('mode-focus').innerText = l.focus;
             document.getElementById('mode-calm').innerText = l.calm;
@@ -125,7 +130,9 @@
             document.getElementById('app-label').innerText = isEnglish ? ui.en.modes[currentMode] : ui.es.modes[currentMode];
             document.getElementById('app-label').style.color = `#${config[currentMode].col.toString(16)}`;
             document.getElementById('app-container').classList.remove('hidden');
-            initThree(config[currentMode].col, config[currentMode].spd);
+            
+            // Inicia la "bola" (esfera 3D) al entrar
+            setTimeout(() => initThree(config[currentMode].col, config[currentMode].spd), 100);
         }
 
         function initThree(col, spd) {
@@ -139,21 +146,21 @@
             
             const sphere = new THREE.Mesh(
                 new THREE.IcosahedronGeometry(2, 20),
-                new THREE.MeshStandardMaterial({ color: col, wireframe: true, transparent: true, opacity: 0.3 })
+                new THREE.MeshStandardMaterial({ color: col, wireframe: true, transparent: true, opacity: 0.4 })
             );
             scene.add(sphere);
-            const light = new THREE.PointLight(0xffffff, 1.5);
+            const light = new THREE.PointLight(0xffffff, 2);
             light.position.set(5, 5, 5);
-            scene.add(light, new THREE.AmbientLight(0xffffff, 0.2));
+            scene.add(light, new THREE.AmbientLight(0xffffff, 0.4));
             camera.position.z = 5;
 
             function animate() {
                 requestAnimationFrame(animate);
                 mouseX += (targetX - mouseX) * 0.05;
                 mouseY += (targetY - mouseY) * 0.05;
-                sphere.rotation.y += 0.002 + (mouseX * 0.1);
-                sphere.rotation.x += (mouseY * 0.1);
-                let p = 1 + Math.sin(Date.now() * spd) * 0.1;
+                sphere.rotation.y += 0.003 + (mouseX * 0.05);
+                sphere.rotation.x += (mouseY * 0.05);
+                let p = 1 + Math.sin(Date.now() * spd) * 0.15;
                 sphere.scale.set(p, p, p);
                 renderer.render(scene, camera);
             }
