@@ -10,7 +10,8 @@
         body { background-color: #020617; color: white; overflow-x: hidden; font-family: sans-serif; }
         .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
         .gradient-text { background: linear-gradient(90deg, #60a5fa, #a855f7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .active-mode { border-color: white !important; background: rgba(255, 255, 255, 0.1); opacity: 1 !important; }
+        /* Clase para resaltar el modo seleccionado */
+        .active-mode { border-color: white !important; background: rgba(255, 255, 255, 0.15) !important; opacity: 1 !important; }
         .transition-all { transition: all 0.3s ease; }
     </style>
 </head>
@@ -18,8 +19,8 @@
 
     <nav class="fixed w-full z-50 p-6 flex justify-between items-center">
         <div class="text-xl font-light tracking-widest">ZEN_SANCTUARY</div>
-        <div class="flex gap-4 md:gap-6 items-center">
-            <button onclick="toggleLang()" id="lang-btn" class="text-[10px] md:text-xs uppercase tracking-widest opacity-70 hover:opacity-100 transition-all border border-white/20 px-3 py-1 rounded-full">
+        <div class="flex gap-4 items-center">
+            <button onclick="toggleLang()" id="lang-btn" class="text-[10px] uppercase tracking-widest opacity-70 hover:opacity-100 transition-all border border-white/20 px-3 py-1 rounded-full">
                 English 🌐
             </button>
             <a href="#" id="nav-premium" class="glass px-4 py-2 rounded-full text-sm font-medium hover:bg-white/10 transition-all">Obtener Premium</a>
@@ -64,9 +65,6 @@
                         <span>Brown Noise</span>
                         <span id="status-brown" class="text-[10px] opacity-40 group-hover:opacity-100">PLAY</span>
                     </button>
-                    <button class="w-full text-left p-4 rounded-xl hover:bg-white/5 transition-all flex justify-between opacity-50 cursor-not-allowed">
-                        <span id="label-ocean">Océano Profundo</span> <span id="label-locked" class="text-[10px]">Bloqueado</span>
-                    </button>
                 </div>
             </div>
             <div id="app-footer" class="text-[10px] opacity-30 leading-relaxed uppercase tracking-tighter mt-8">
@@ -81,6 +79,7 @@
         let currentLang = 'es';
         let currentMode = 'focus';
 
+        // Correspondencia de lógica: Color, Velocidad de pulso y Etiquetas
         const configs = {
             focus: { color: 0x60a5fa, speed: 0.001, label_es: "ENFOQUE PROFUNDO", label_en: "DEEP FOCUS" },
             calm: { color: 0xa855f7, speed: 0.0005, label_es: "CALMA TERAPÉUTICA", label_en: "THERAPEUTIC CALM" },
@@ -94,6 +93,7 @@
 
         function setMode(mode) {
             currentMode = mode;
+            // Actualizar botones visualmente
             document.querySelectorAll('[id^="mode-"]').forEach(b => b.classList.remove('active-mode'));
             document.getElementById(`mode-${mode}`).classList.add('active-mode');
         }
