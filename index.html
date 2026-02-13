@@ -3,82 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Zen Sanctuary | Neural Balance</title>
+    <title>Zen Sanctuary</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { background-color: #010413; color: white; overflow: hidden; font-family: sans-serif; }
+        body { background-color: #020410; color: white; overflow: hidden; font-family: sans-serif; }
         
-        /* Botones con interactividad forzada */
-        .interactive-button {
+        .interactive {
             cursor: pointer !important;
             pointer-events: auto !important;
-            transition: all 0.2s ease-in-out;
-            z-index: 100;
+            transition: all 0.3s ease;
         }
 
         .mode-btn {
-            opacity: 0.4;
+            opacity: 0.5;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.02);
         }
 
-        .mode-btn:hover {
-            opacity: 1 !important;
-            background: rgba(255, 255, 255, 0.05);
-        }
+        .mode-btn:hover { opacity: 1; background: rgba(255, 255, 255, 0.1); }
+        
+        /* Estados activos claros */
+        .active-focus { opacity: 1; border-color: #3b82f6; color: #3b82f6; box-shadow: 0 0 15px rgba(59, 130, 246, 0.3); }
+        .active-calm { opacity: 1; border-color: #a855f7; color: #a855f7; box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
+        .active-creative { opacity: 1; border-color: #facc15; color: #facc15; box-shadow: 0 0 15px rgba(250, 204, 21, 0.3); }
 
-        .active-focus { opacity: 1 !important; border-color: #3b82f6 !important; color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-        .active-calm { opacity: 1 !important; border-color: #a855f7 !important; color: #a855f7; background: rgba(168, 85, 247, 0.1); }
-        .active-creative { opacity: 1 !important; border-color: #facc15 !important; color: #facc15; background: rgba(250, 204, 21, 0.1); }
-
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        
+        /* Título refinado, no gigante */
+        .main-title { font-weight: 100; letter-spacing: -0.02em; line-height: 1.1; }
     </style>
 </head>
 <body>
 
-    <nav class="fixed w-full z-[100] p-8 flex justify-between items-center pointer-events-none">
-        <div class="text-sm font-light tracking-[0.5em] opacity-50">ZEN_SANCTUARY</div>
-        <button onclick="toggleLang()" id="lang-btn" class="interactive-button glass px-6 py-2 rounded-full text-[10px] uppercase tracking-widest">ENGLISH 🌐</button>
+    <nav class="fixed w-full z-[100] p-6 flex justify-between items-center pointer-events-none">
+        <div class="text-[10px] tracking-[0.5em] opacity-40">ZEN_SANCTUARY</div>
+        <button onclick="toggleLang()" id="lang-btn" class="interactive glass px-5 py-2 rounded-full text-[10px] uppercase tracking-widest">ENGLISH 🌐</button>
     </nav>
 
-    <section id="hero" class="min-h-screen flex flex-col justify-center items-center px-4 text-center relative z-10">
-        <h1 id="main-title" class="text-7xl md:text-9xl font-thin mb-12 tracking-tighter">
-            Tu mente, <span class="block opacity-30">en orden.</span>
+    <section id="hero" class="min-h-screen flex flex-col justify-center items-center px-4 text-center relative z-50">
+        <h1 id="main-title" class="main-title text-5xl md:text-7xl mb-12">
+            Tu mente, <span class="block opacity-30 italic">en orden.</span>
         </h1>
         
-        <div class="w-full max-w-xl space-y-10">
+        <div class="w-full max-w-lg space-y-10">
             <input type="text" id="mainTask" placeholder="¿En qué vas a trabajar?" 
-                   class="w-full bg-transparent border-b border-white/20 p-6 outline-none text-center text-2xl md:text-3xl font-extralight focus:border-white/60 transition-all">
+                   class="w-full bg-transparent border-b border-white/10 p-4 outline-none text-center text-xl md:text-2xl font-light focus:border-white/40 transition-all">
             
-            <div class="flex flex-wrap justify-center gap-4">
-                <button id="mode-focus" onclick="setMode('focus')" class="interactive-button mode-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest">Enfoque</button>
-                <button id="mode-calm" onclick="setMode('calm')" class="interactive-button mode-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest">Calma</button>
-                <button id="mode-creative" onclick="setMode('creative')" class="interactive-button mode-btn px-8 py-3 rounded-full text-[10px] uppercase tracking-widest">Crear</button>
+            <div class="flex flex-wrap justify-center gap-3">
+                <button id="mode-focus" onclick="setMode('focus')" class="interactive mode-btn px-6 py-2 rounded-full text-[10px] uppercase tracking-widest">Enfoque</button>
+                <button id="mode-calm" onclick="setMode('calm')" class="interactive mode-btn px-6 py-2 rounded-full text-[10px] uppercase tracking-widest">Calma</button>
+                <button id="mode-creative" onclick="setMode('creative')" class="interactive mode-btn px-6 py-2 rounded-full text-[10px] uppercase tracking-widest">Crear</button>
             </div>
 
-            <button onclick="startApp()" id="start-btn" class="interactive-button px-16 py-4 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:scale-105 active:scale-95 shadow-xl">
+            <button onclick="startApp()" id="start-btn" class="interactive px-12 py-4 rounded-full bg-white text-black text-[10px] font-bold uppercase tracking-[0.3em] hover:scale-105 active:scale-95">
                 Entrar
             </button>
         </div>
     </section>
 
-    <main id="app-container" class="hidden fixed inset-0 z-[200] bg-[#00020a] flex flex-col md:flex-row">
-        <aside class="w-full md:w-96 glass p-12 flex flex-col justify-between z-20">
-            <div class="space-y-12">
-                <button onclick="location.reload()" id="back-btn" class="interactive-button opacity-50 text-[10px] uppercase tracking-[0.3em] hover:opacity-100">← Volver</button>
+    <main id="app-container" class="hidden fixed inset-0 z-[200] bg-[#000208] flex flex-col md:flex-row">
+        <aside class="w-full md:w-80 glass p-10 flex flex-col justify-between z-20">
+            <div class="space-y-10">
+                <button onclick="location.reload()" id="back-btn" class="interactive opacity-40 text-[10px] uppercase tracking-[0.3em] hover:opacity-100">← Volver</button>
                 <div>
-                    <h2 id="app-label" class="text-[10px] uppercase tracking-[0.4em] font-bold mb-4 opacity-70"></h2>
-                    <div id="displayTask" class="text-4xl font-extralight italic text-slate-100 leading-tight"></div>
+                    <h2 id="app-label" class="text-[10px] uppercase tracking-[0.4em] font-bold mb-4 opacity-60"></h2>
+                    <div id="displayTask" class="text-3xl font-extralight italic text-slate-100 leading-snug"></div>
                 </div>
                 <div class="space-y-6">
-                    <p id="hint-text" class="text-[9px] uppercase tracking-widest text-white/30 leading-relaxed">Mueve el cursor para influir en la frecuencia</p>
-                    <button onclick="toggleNoise()" class="interactive-button w-full glass p-6 rounded-3xl text-left flex justify-between items-center group">
-                        <span id="noise-label" class="text-[10px] uppercase tracking-[0.2em] opacity-60">Sonido Brown</span>
-                        <div id="noise-dot" class="w-2 h-2 rounded-full bg-blue-500 opacity-0 shadow-[0_0_10px_#3b82f6]"></div>
+                    <p id="hint-text" class="text-[9px] uppercase tracking-widest text-white/20 leading-relaxed">Mueve el cursor para equilibrar la esfera</p>
+                    <button onclick="toggleNoise()" class="interactive w-full glass p-5 rounded-2xl text-left flex justify-between items-center group">
+                        <span id="noise-label" class="text-[10px] uppercase tracking-[0.2em] opacity-50">Sonido Brown</span>
+                        <div id="noise-dot" class="w-1.5 h-1.5 rounded-full bg-blue-500 opacity-0 shadow-[0_0_8px_#3b82f6]"></div>
                     </button>
                 </div>
             </div>
-            <div class="text-[9px] opacity-10 uppercase tracking-[0.3em]">NEURAL_REGULATION // 2026</div>
+            <div class="text-[9px] opacity-10 uppercase tracking-[0.3em]">NEURAL_CORE // 2026</div>
         </aside>
         <div id="canvas-container" class="flex-1 bg-black"></div>
     </main>
@@ -89,36 +89,16 @@
         let audioCtx, noiseNode, isPlaying = false;
         let mouseX = 0, mouseY = 0, targetX = 0, targetY = 0;
 
-        const translations = {
-            es: {
-                title: 'Tu mente, <span class="block opacity-30">en orden.</span>',
-                placeholder: '¿En qué vas a trabajar?',
-                focus: 'Enfoque', calm: 'Calma', creative: 'Crear',
-                enter: 'Entrar', back: '← Volver', 
-                hint: 'Mueve el cursor para influir en la frecuencia',
-                noise: 'Sonido Brown',
-                modes: { focus: 'MODO ENFOQUE', calm: 'MODO CALMA', creative: 'MODO CREATIVO' }
-            },
-            en: {
-                title: 'Your mind, <span class="block opacity-30">uncluttered.</span>',
-                placeholder: 'What is your focus?',
-                focus: 'Focus', calm: 'Calm', creative: 'Create',
-                enter: 'Enter', back: '← Back', 
-                hint: 'Move cursor to influence frequency',
-                noise: 'Brown Noise',
-                modes: { focus: 'FOCUS MODE', calm: 'CALM MODE', creative: 'CREATIVE MODE' }
-            }
+        const ui = {
+            es: { title: 'Tu mente, <span class="block opacity-30 italic">en orden.</span>', placeholder: '¿En qué vas a trabajar?', focus: 'Enfoque', calm: 'Calma', creative: 'Crear', enter: 'Entrar', back: '← Volver', hint: 'Mueve el cursor para equilibrar la esfera', noise: 'Sonido Brown', modes: { focus: 'MODO ENFOQUE', calm: 'MODO CALMA', creative: 'MODO CREATIVO' } },
+            en: { title: 'Your mind, <span class="block opacity-30 italic">uncluttered.</span>', placeholder: 'What is your focus?', focus: 'Focus', calm: 'Calm', creative: 'Create', enter: 'Enter', back: '← Back', hint: 'Move cursor to balance the sphere', noise: 'Brown Noise', modes: { focus: 'FOCUS MODE', calm: 'CALM MODE', creative: 'CREATIVE MODE' } }
         };
 
-        const moods = {
-            focus: { color: 0x3b82f6, speed: 0.001 },
-            calm: { color: 0xa855f7, speed: 0.0004 },
-            creative: { color: 0xfacc15, speed: 0.002 }
-        };
+        const config = { focus: { col: 0x3b82f6, spd: 0.001 }, calm: { col: 0xa855f7, spd: 0.0004 }, creative: { col: 0xfacc15, spd: 0.0025 } };
 
         function toggleLang() {
             isEnglish = !isEnglish;
-            const l = isEnglish ? translations.en : translations.es;
+            const l = isEnglish ? ui.en : ui.es;
             document.getElementById('lang-btn').innerText = isEnglish ? "ESPAÑOL 🌐" : "ENGLISH 🌐";
             document.getElementById('main-title').innerHTML = l.title;
             document.getElementById('mainTask').placeholder = l.placeholder;
@@ -134,29 +114,18 @@
 
         function setMode(mode) {
             currentMode = mode;
-            // Limpiar clases activas
-            document.querySelectorAll('.mode-btn').forEach(b => {
-                b.classList.remove('active-focus', 'active-calm', 'active-creative');
-            });
-            // Aplicar clase según modo
-            const btn = document.getElementById(`mode-${mode}`);
-            if(mode === 'focus') btn.classList.add('active-focus');
-            if(mode === 'calm') btn.classList.add('active-calm');
-            if(mode === 'creative') btn.classList.add('active-creative');
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active-focus', 'active-calm', 'active-creative'));
+            document.getElementById(`mode-${mode}`).classList.add(`active-${mode}`);
         }
 
         function startApp() {
             const task = document.getElementById('mainTask').value;
-            if(!task) {
-                alert(isEnglish ? "Please enter a task" : "Por favor, escribe una tarea");
-                return;
-            }
+            if(!task) return;
             document.getElementById('displayTask').innerText = `"${task}"`;
-            const label = isEnglish ? translations.en.modes[currentMode] : translations.es.modes[currentMode];
-            document.getElementById('app-label').innerText = label;
-            document.getElementById('app-label').style.color = `#${moods[currentMode].color.toString(16)}`;
+            document.getElementById('app-label').innerText = isEnglish ? ui.en.modes[currentMode] : ui.es.modes[currentMode];
+            document.getElementById('app-label').style.color = `#${config[currentMode].col.toString(16)}`;
             document.getElementById('app-container').classList.remove('hidden');
-            initThree(moods[currentMode].color, moods[currentMode].speed);
+            initThree(config[currentMode].col, config[currentMode].spd);
         }
 
         function initThree(col, spd) {
@@ -169,12 +138,13 @@
             container.appendChild(renderer.domElement);
             
             const sphere = new THREE.Mesh(
-                new THREE.IcosahedronGeometry(2, 25),
+                new THREE.IcosahedronGeometry(2, 20),
                 new THREE.MeshStandardMaterial({ color: col, wireframe: true, transparent: true, opacity: 0.3 })
             );
             scene.add(sphere);
-            scene.add(new THREE.PointLight(0xffffff, 2).clone().set(5,5,5));
-            scene.add(new THREE.AmbientLight(0xffffff, 0.2));
+            const light = new THREE.PointLight(0xffffff, 1.5);
+            light.position.set(5, 5, 5);
+            scene.add(light, new THREE.AmbientLight(0xffffff, 0.2));
             camera.position.z = 5;
 
             function animate() {
@@ -183,8 +153,8 @@
                 mouseY += (targetY - mouseY) * 0.05;
                 sphere.rotation.y += 0.002 + (mouseX * 0.1);
                 sphere.rotation.x += (mouseY * 0.1);
-                let pulse = 1 + Math.sin(Date.now() * spd) * 0.1;
-                sphere.scale.set(pulse, pulse, pulse);
+                let p = 1 + Math.sin(Date.now() * spd) * 0.1;
+                sphere.scale.set(p, p, p);
                 renderer.render(scene, camera);
             }
             animate();
@@ -218,7 +188,6 @@
             isPlaying = !isPlaying;
         }
 
-        // Inicializar modo por defecto
         setMode('focus');
     </script>
 </body>
